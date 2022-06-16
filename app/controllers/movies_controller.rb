@@ -7,51 +7,32 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.all_ratings
-    hashed = params[:ratings]
-    if params[:ratings].is_a?(Array)
-      hashed = Movie.hash(params[:ratings])
+    sort = params[:sort] || session[:sort]
+    case sort
+    when 'title'
+      ordering,@title_header = {:title => :asc}, 'bg-warning hilite'
+    when 'release_date'
+      ordering,@date_header = {:release_date => :asc}, 'bg-warning hilite'
     end
-    @ratings_to_show_hash = hashed.nil? ? @all_ratings : hashed.keys
-    @movies = Movie.with_ratings(@ratings_to_show_hash)
+
+    @all_ratings = Movie.all_ratings
+    @selected_ratings = params[:ratings] || session[:ratings] || {}
+
+    if @selected_ratings == {}
+      @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
+    end
 
     @movies_title_css = "hilite bg-warning"
     redirect = false
 
-    if params.has_key?(:to_sort)
-      @clicked = params[:to_sort]
-      session[:to_sort] = params[:to_sort]
-      
-    elsif session.has_key?(:to_sort)
-      @clicked = session[:to_sort]
-      redirect = true
-
-    else     
-      @clicked = ''
+    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
+      session[:sort] = sort
+      session[:ratings] = @selected_ratings
+      redirect_to :sort => sort, :ratings => @selected_ratings and return
     end
+
+    @movies = Movie.where(rating: @selected_ratings.keys).order(ordering)
     
-
-    if params.has_key?(:ratings)
-      @ratings_to_show = params[:ratings]
-      session[:ratings] = @ratings_to_show_hash
-      
-    elsif session.has_key?(:ratings)
-      @ratings_to_show_hash = session[:ratings]
-      redirect = true
-
-    end
-
-    if @clicked == 'movie_title'
-      @movies = @movies.order(:title)
-    elsif @clicked == 'release_date'
-      @movies = @movies.order(:release_date)  
-
-    end
-
-    if redirect
-      redirect_to movies_path(:ratings => @ratings_to_show, :to_sort => @clicked)
-    end 
-
   end
 
   def new
