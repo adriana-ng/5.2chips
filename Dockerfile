@@ -28,7 +28,7 @@ ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
 # Redirect Rails log to STDOUT for Cloud Run to capture
 ENV RAILS_LOG_TO_STDOUT=true
-ENV SECRET_KEY_BASE=<YOUR SECRET_KEY_BASE>
+ENV SECRET_KEY_BASE=d5b318fbd02bd7bbb0c1d0e2c3593050016bbe95505ca589854d444677deb942a6e62a189c9527b88cc608db97d5aefd24e9bc4e02d2309f52b9c19176b7af37
 
 # pre-compile Rails assets with master key
 RUN bundle exec rake assets:precompile
@@ -42,4 +42,5 @@ RUN bundle exec rake db:seed
 
 EXPOSE 8080
 CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
+
 
