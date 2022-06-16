@@ -21,5 +21,9 @@ class Movie < ActiveRecord::Base
     end
   end
 
+  def self.hash(ratings)
+    hash = Hash[ratings.collect { |item| [item, ""] } ]
+  end
+
     
 end

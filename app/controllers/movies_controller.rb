@@ -7,11 +7,14 @@ class MoviesController < ApplicationController
   end
 
   def index
-    
     @all_ratings = Movie.all_ratings
-    @ratings_to_show_hash = params[:ratings].nil? ? @all_ratings : params[:ratings].keys
-    @movies = Movie.sort(@ratings_to_show_hash)
-
+    hashed = params[:ratings]
+    if params[:ratings].is_a?(Array)
+      hashed = Movie.hash(params[:ratings])
+    end
+    @ratings_to_show_hash = hashed.nil? ? @all_ratings : hashed.keys
+    @movies = Movie.order("release_date DESC")
+    @movies_title_css = "hilite bg-warning"
   end
 
   def new
