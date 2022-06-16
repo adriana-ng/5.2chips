@@ -3,10 +3,6 @@ class Movie < ActiveRecord::Base
     all_ratings = ['G','PG','PG-13','R']
   end
 
-  def self.sort(ratings_list)
-    Movie.where(rating: ratings_list)
-
-  end
 
   def self.with_ratings(ratings_list)
     # if ratings_list is an array such as ['G', 'PG', 'R'], retrieve all
@@ -20,6 +16,12 @@ class Movie < ActiveRecord::Base
       where(rating: ratings_list)
     end
   end
+
+  def self.sort(ratings_list)
+    Movie.where(rating: ratings_list)
+
+  end
+
 
   def self.hash(ratings)
     hash = Hash[ratings.collect { |item| [item, ""] } ]

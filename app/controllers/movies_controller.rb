@@ -13,8 +13,45 @@ class MoviesController < ApplicationController
       hashed = Movie.hash(params[:ratings])
     end
     @ratings_to_show_hash = hashed.nil? ? @all_ratings : hashed.keys
-    @movies = Movie.order("release_date DESC")
+    @movies = Movie.with_ratings(@ratings_to_show_hash)
+
     @movies_title_css = "hilite bg-warning"
+    redirect = false
+
+    if params.has_key?(:to_sort)
+      @clicked = params[:to_sort]
+      session[:to_sort] = params[:to_sort]
+      
+    elsif session.has_key?(:to_sort)
+      @clicked = session[:to_sort]
+      redirect = true
+
+    else     
+      @clicked = ''
+    end
+    
+
+    if params.has_key?(:ratings)
+      @ratings_to_show = params[:ratings]
+      session[:ratings] = @ratings_to_show_hash
+      
+    elsif session.has_key?(:ratings)
+      @ratings_to_show_hash = session[:ratings]
+      redirect = true
+
+    end
+
+    if @clicked == 'movie_title'
+      @movies = @movies.order(:title)
+    elsif @clicked == 'release_date'
+      @movies = @movies.order(:release_date)  
+
+    end
+
+    if redirect
+      redirect_to movies_path(:ratings => @ratings_to_show, :to_sort => @clicked)
+    end 
+
   end
 
   def new
